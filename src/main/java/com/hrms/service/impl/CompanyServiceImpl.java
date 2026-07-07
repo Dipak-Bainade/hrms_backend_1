@@ -79,7 +79,8 @@ public class CompanyServiceImpl implements CompanyService{
 		    company.setCountry(request.getCountry());
 		    company.setPinCode(request.getPinCode());
 		    company.setWebsite(request.getWebsite());
-		 
+		    company.setSubscriptionType("FREE");
+		    company.setSubscriptionExpiry(LocalDate.now().plusDays(30));
 		    company = companyRepository.save(company);
 		    
 		    Role role = roleRepository.findByRoleName("COMPANY_ADMIN")
