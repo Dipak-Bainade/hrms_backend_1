@@ -22,10 +22,13 @@ public class CustomUserPrincipal implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        return List.of(
-                new SimpleGrantedAuthority(user.getRole().getRoleName()));
+        return user.getRole()
+                   .getPermissions()
+                   .stream()
+                   .map(permission ->
+                           new SimpleGrantedAuthority(permission.getPermissionName()))
+                   .toList();
     }
-
     @Override
     public String getPassword() {
         return user.getPassword();
