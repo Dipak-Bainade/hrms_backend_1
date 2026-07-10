@@ -22,10 +22,13 @@ public class JwtService {
     private long jwtExpiration;
 
     // Generate JWT Token
-    public String generateToken(String username) {
+    public String generateToken(AuthenticatedUser user) {
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getUsername())
+                .claim("userId", user.getUserId())
+                .claim("companyId", user.getCompanyId())
+                .claim("role", user.getRole())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -70,6 +73,24 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+    
+    public Long extractUserId(String token) {
+
+        return extractAllClaims(token)
+                .get("userId", Long.class);
+    }
+
+    public Long extractCompanyId(String token) {
+
+        return extractAllClaims(token)
+                .get("companyId", Long.class);
+    }
+
+    public String extractRole(String token) {
+
+        return extractAllClaims(token)
+                .get("role", String.class);
     }
 
 }

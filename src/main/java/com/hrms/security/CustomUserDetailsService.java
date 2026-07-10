@@ -1,5 +1,10 @@
 package com.hrms.security;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +30,22 @@ public class CustomUserDetailsService implements UserDetailsService{
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found"));
 
-        return new CustomUserPrincipal(user);
+    
+        Collection<? extends GrantedAuthority> authorities =
+                user.getRole()
+                    .getPermissions()
+                    .stream()
+                    .map(permission ->
+                            new SimpleGrantedAuthority(permission.getPermissionName()))
+                    .toList();
+        
+        return new AuthenticatedUser(
+                user.getId(),
+                user.getCompany().getId(),
+                user.getRole().getRoleName(),
+                user.getEmail(),
+                user.getPassword(),
+                authorities
+        );
     }
 }

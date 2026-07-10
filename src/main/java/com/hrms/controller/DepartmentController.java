@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hrms.dto.request.DepartmentRequest;
+import com.hrms.dto.response.ApiResponse;
 import com.hrms.dto.response.DepartmentResponse;
 import com.hrms.entity.Department;
 import com.hrms.service.DepartmentService;
@@ -33,12 +34,19 @@ public class DepartmentController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('DEPARTMENT_CREATE')")
-    public ResponseEntity<DepartmentResponse> createDepartment(
+    public ResponseEntity<ApiResponse<DepartmentResponse>> createDepartment(
             @Valid @RequestBody DepartmentRequest request) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(departmentService.createDepartment(request));
+        DepartmentResponse response = departmentService.createDepartment(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.<DepartmentResponse>builder()
+                                .success(true)
+                                .message("Department created successfully.")
+                                .data(response)
+                                .build()
+                );
     }
 
     @GetMapping

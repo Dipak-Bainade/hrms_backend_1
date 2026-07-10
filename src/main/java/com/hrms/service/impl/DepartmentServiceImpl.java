@@ -8,6 +8,8 @@ import com.hrms.dto.request.DepartmentRequest;
 import com.hrms.dto.response.DepartmentResponse;
 import com.hrms.entity.Company;
 import com.hrms.entity.Department;
+import com.hrms.exception.DuplicateResourceException;
+import com.hrms.exception.ResourceNotFoundException;
 import com.hrms.repository.CompanyRepository;
 import com.hrms.repository.DepartmentRepository;
 import com.hrms.security.CurrentUser;
@@ -45,13 +47,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 	            request.getDepartmentName(),
 	            companyId)) {
 
-	        throw new RuntimeException(
-	                "Department already exists.");
+	    	throw new DuplicateResourceException(
+	    	        "Department already exists.");
 	    }
 
 	    Company company = companyRepository.findById(companyId)
 	            .orElseThrow(() ->
-	                    new RuntimeException("Company not found"));
+	                    new ResourceNotFoundException("Company not found."));
 
 	    Department department = new Department();
 

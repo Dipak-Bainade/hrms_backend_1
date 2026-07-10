@@ -2,22 +2,35 @@ package com.hrms.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hrms.dto.request.EmployeeRequest;
+import com.hrms.dto.response.ApiResponse;
+import com.hrms.dto.response.EmployeeResponse;
 import com.hrms.entity.Employee;
 import com.hrms.service.EmployeeService;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
 
 @RestController
-@RequestMapping("/test")
+@RequestMapping("/api/employees")
+@Validated
 public class EmployeeController {
 	
 	private final EmployeeService employeeService;
@@ -32,36 +45,116 @@ public class EmployeeController {
 	    return "Welcome HRMS2";
 	}
 	
-	
-	
-	
-	@PostMapping
-	@PreAuthorize("hasAuthority('EMPLOYEE_CREATE')")
-	public Employee createEmployee(@RequestBody Employee employee) {
+    @PostMapping
+    @PreAuthorize("hasAuthority('EMPLOYEE_CREATE')")
+    public ResponseEntity<ApiResponse<EmployeeResponse>> createEmployee(
+            @Valid @RequestBody EmployeeRequest request) {
 
-	    return employeeService.createEmployee(employee);
-	}
+        EmployeeResponse response =
+                employeeService.createEmployee(request);
 
-	@GetMapping()
-	@PreAuthorize("hasAuthority('EMPLOYEE_VIEW')")
-	public List<Employee> getEmployees() {
-	    return employeeService.getAllEmployees();
-	}
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        new ApiResponse<>(
+                                true,
+                                "Employee created successfully.",
+                                response
+                        )
+                );
+    }
 	
-	@PutMapping("/{id}")
-	@PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
-	public Employee updateEmployee(
-	        @PathVariable Long id,
-	        @RequestBody Employee employee) {
-
-	    return employeeService.updateEmployee(id, employee);
-	}
 	
-	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAuthority('EMPLOYEE_DELETE')")
-	public void deleteEmployee(@PathVariable Long id) {
+    @GetMapping
+    @PreAuthorize("hasAuthority('EMPLOYEE_VIEW')")
+    public ResponseEntity<ApiResponse<Page<EmployeeResponse>>> getEmployees(
 
-	    employeeService.deleteEmployee(id);
-	}
+            @RequestParam(defaultValue = "") String search,
+
+            @RequestParam(defaultValue = "0") int page,
+
+            @RequestParam(defaultValue = "10") int size,
+
+            @RequestParam(defaultValue = "employeeCode") String sortBy,
+
+            @RequestParam(defaultValue = "asc") String direction) {
+
+        Page<EmployeeResponse> response =
+                employeeService.getEmployees(
+
+                        search,
+
+                        page,
+
+                        size,
+
+                        sortBy,
+
+                        direction);
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<Page<EmployeeResponse>>builder()
+
+                        .success(true)
+
+                        .message("Employees fetched successfully.")
+
+                        .data(response)
+
+                        .build());
+
+    }
+    
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('EMPLOYEE_VIEW')")
+    public ResponseEntity<ApiResponse<EmployeeResponse>> getEmployee(
+            @PathVariable Long id) {
+
+        EmployeeResponse response =
+                employeeService.getEmployeeById(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<EmployeeResponse>builder()
+                        .success(true)
+                        .message("Employee fetched successfully.")
+                        .data(response)
+                        .build());
+    }
+    
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
+    public ResponseEntity<ApiResponse<EmployeeResponse>> updateEmployee(
+            @PathVariable Long id,
+            @Valid @RequestBody EmployeeRequest request) {
+
+        EmployeeResponse response =
+                employeeService.updateEmployee(id, request);
+
+        return ResponseEntity.ok(
+                ApiResponse.<EmployeeResponse>builder()
+                        .success(true)
+                        .message("Employee updated successfully.")
+                        .data(response)
+                        .build());
+    }
+	
+    
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
+    public ResponseEntity<ApiResponse<Void>> updateStatus(
+            @PathVariable Long id,
+            @RequestParam boolean active) {
+
+        employeeService.updateEmployeeStatus(id, active);
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .message(active
+                                ? "Employee activated successfully."
+                                : "Employee deactivated successfully.")
+                        .build());
+    }
+	
 	
 }
