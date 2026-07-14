@@ -19,6 +19,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>{
 	        Long companyId,
 	        Pageable pageable);
 	
+	List<Employee> findByCompanyId(Long companyId);
+	
 
     Optional<Employee> findByIdAndCompanyId(
             Long id,
@@ -33,6 +35,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>{
             Long companyId);
     
     Optional<Employee> findTopByCompanyIdOrderByEmployeeCodeDesc(Long companyId);
+    
+    List<Employee> findByCompanyIdAndActiveTrue(Long companyId);
     
     
     @Query("""

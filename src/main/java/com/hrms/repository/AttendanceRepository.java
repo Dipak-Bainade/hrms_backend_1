@@ -63,5 +63,25 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
     		        LocalDate toDate,
 
     		        Pageable pageable);
+   
+    
+    @Query("""
+    		SELECT a
+    		FROM Attendance a
+    		WHERE a.company.id = :companyId
+    		AND YEAR(a.attendanceDate) = :year
+    		AND MONTH(a.attendanceDate) = :month
+    		AND (:employeeId IS NULL OR a.employee.id = :employeeId)
+    		ORDER BY a.attendanceDate
+    		""")
+    		List<Attendance> findMonthlyAttendance(
+
+    		        Long companyId,
+
+    		        Long employeeId,
+
+    		        int month,
+
+    		        int year);
     
 }

@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.hrms.dto.request.AttendanceRequest;
 import com.hrms.dto.response.AttendanceResponse;
+import com.hrms.dto.response.MonthlyAttendanceResponse;
 import com.hrms.entity.Attendance;
 import com.hrms.entity.Company;
 import com.hrms.entity.Employee;
@@ -307,7 +310,116 @@ public class AttendanceServiceImpl implements AttendanceService{
         return attendance.map(this::mapToResponse);
 
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public List<MonthlyAttendanceResponse> getMonthlyAttendance(
 
+            Long employeeId,
+
+            int month,
+
+            int year) {
+
+        Long companyId = currentUser.getCompanyId();
+
+        List<Attendance> attendanceList =
+                attendanceRepository.findMonthlyAttendance(
+
+                        companyId,
+
+                        employeeId,
+
+                        month,
+
+                        year);
+
+        Map<Long, List<Attendance>> employeeAttendance =
+                attendanceList.stream()
+
+                        .collect(Collectors.groupingBy(
+                                attendance ->
+                                        attendance.getEmployee().getId()));
+
+        return employeeAttendance.values()
+
+                .stream()
+
+                .map(this::buildMonthlyAttendanceResponse)
+
+                .toList();
+
+    }
+
+    private MonthlyAttendanceResponse buildMonthlyAttendanceResponse(
+            List<Attendance> attendanceList) {
+
+        Employee employee = attendanceList.get(0).getEmployee();
+
+        long present = attendanceList.stream()
+                .filter(a -> a.getStatus() == AttendanceStatus.PRESENT)
+                .count();
+
+        long absent = attendanceList.stream()
+                .filter(a -> a.getStatus() == AttendanceStatus.ABSENT)
+                .count();
+
+        long leave = attendanceList.stream()
+                .filter(a -> a.getStatus() == AttendanceStatus.LEAVE)
+                .count();
+
+        long holiday = attendanceList.stream()
+                .filter(a -> a.getStatus() == AttendanceStatus.HOLIDAY)
+                .count();
+
+        long weekOff = attendanceList.stream()
+                .filter(a -> a.getStatus() == AttendanceStatus.WEEK_OFF)
+                .count();
+
+        long workFromHome = attendanceList.stream()
+                .filter(a -> a.getStatus() == AttendanceStatus.WORK_FROM_HOME)
+                .count();
+
+        double totalHours = attendanceList.stream()
+                .filter(a -> a.getWorkingHours() != null)
+                .mapToDouble(Attendance::getWorkingHours)
+                .sum();
+
+        double averageHours = present > 0
+                ? totalHours / present
+                : 0;
+
+        return MonthlyAttendanceResponse.builder()
+
+                .employeeId(employee.getId())
+
+                .employeeCode(employee.getEmployeeCode())
+
+                .employeeName(employee.getFirstName() + " " + employee.getLastName())
+
+                .month(attendanceList.get(0).getAttendanceDate().getMonthValue())
+
+                .year(attendanceList.get(0).getAttendanceDate().getYear())
+
+                .totalPresentDays(present)
+
+                .totalAbsentDays(absent)
+
+                .totalLeaveDays(leave)
+
+                .totalHolidayDays(holiday)
+
+                .totalWeekOffDays(weekOff)
+
+                .totalWorkFromHomeDays(workFromHome)
+
+                .totalWorkingHours(totalHours)
+
+                .averageWorkingHours(averageHours)
+
+                .build();
+
+    }
 
 
 

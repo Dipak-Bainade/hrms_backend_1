@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 
 import com.hrms.dto.request.AttendanceRequest;
 import com.hrms.dto.response.AttendanceResponse;
+import com.hrms.dto.response.MonthlyAttendanceResponse;
 
 public interface AttendanceService {
 	
@@ -38,5 +39,12 @@ public interface AttendanceService {
 
             String direction);
     
+    List<MonthlyAttendanceResponse> getMonthlyAttendance(
+
+            Long employeeId,
+
+            int month,
+
+            int year);
 
 }

@@ -21,6 +21,7 @@ import com.hrms.repository.DesignationRepository;
 import com.hrms.repository.EmployeeRepository;
 import com.hrms.security.CurrentUser;
 import com.hrms.service.EmployeeService;
+import com.hrms.service.LeaveBalanceInitializerService;
 
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ public class EmployeeServiceImpl implements EmployeeService{
 	    private final DesignationRepository designationRepository;
 	    private final CompanyRepository companyRepository;
 	    private final CurrentUser currentUser;
+	    private final LeaveBalanceInitializerService leaveBalanceInitializerService;
 	    
 	    @Override
 	    public EmployeeResponse createEmployee(EmployeeRequest request) {
@@ -67,6 +69,10 @@ public class EmployeeServiceImpl implements EmployeeService{
 
 	        employee = employeeRepository.save(employee);
 
+
+         leaveBalanceInitializerService
+        .initializeForEmployee(employee);
+	        
 	        return mapToResponse(employee);
 	    }
 	    

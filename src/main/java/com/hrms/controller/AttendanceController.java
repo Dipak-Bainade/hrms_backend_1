@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hrms.dto.request.AttendanceRequest;
 import com.hrms.dto.response.ApiResponse;
 import com.hrms.dto.response.AttendanceResponse;
+import com.hrms.dto.response.MonthlyAttendanceResponse;
 import com.hrms.service.AttendanceService;
 
 import jakarta.validation.Valid;
@@ -150,6 +151,45 @@ public class AttendanceController {
                         .build());
 
     }
+    
+    
+    @GetMapping("/monthly")
+    @PreAuthorize("hasAuthority('ATTENDANCE_VIEW')")
+    public ResponseEntity<ApiResponse<List<MonthlyAttendanceResponse>>> getMonthlyAttendance(
+
+            @RequestParam(required = false)
+            Long employeeId,
+
+            @RequestParam
+            int month,
+
+            @RequestParam
+            int year) {
+
+        List<MonthlyAttendanceResponse> response =
+
+                attendanceService.getMonthlyAttendance(
+
+                        employeeId,
+
+                        month,
+
+                        year);
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<List<MonthlyAttendanceResponse>>builder()
+
+                        .success(true)
+
+                        .message("Monthly attendance report generated successfully.")
+
+                        .data(response)
+
+                        .build());
+
+    }
+    
     
     
 
