@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.hrms.dto.payroll.AttendanceSummary;
 import com.hrms.dto.request.AttendanceRequest;
 import com.hrms.dto.response.AttendanceResponse;
 import com.hrms.dto.response.MonthlyAttendanceResponse;
@@ -426,6 +427,16 @@ public class AttendanceServiceImpl implements AttendanceService{
 
 	@Override
 	public List<AttendanceResponse> getEmployeeAttendance(Long employeeId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
+	@Override
+	public AttendanceSummary getAttendanceSummary(Long employeeId, Integer month, Integer year) {
 		// TODO Auto-generated method stub
 		return null;
 	}

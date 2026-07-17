@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 
+import com.hrms.dto.payroll.AttendanceSummary;
 import com.hrms.dto.request.AttendanceRequest;
 import com.hrms.dto.response.AttendanceResponse;
 import com.hrms.dto.response.MonthlyAttendanceResponse;
@@ -46,5 +47,10 @@ public interface AttendanceService {
             int month,
 
             int year);
+    
+    AttendanceSummary getAttendanceSummary(
+            Long employeeId,
+            Integer month,
+            Integer year);
 
 }
