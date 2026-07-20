@@ -42,5 +42,7 @@ public class LeaveType {
     
     @Column(nullable = false)
     private Boolean carryForwardAllowed = false;
+    
+    private String leaveTypeName;
 
 }

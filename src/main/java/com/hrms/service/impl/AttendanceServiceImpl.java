@@ -46,6 +46,24 @@ public class AttendanceServiceImpl implements AttendanceService{
     private final CompanyRepository companyRepository;
 
     private final CurrentUser currentUser;
+    
+    private Employee getLoggedInEmployee() {
+
+        return employeeRepository
+
+                .findByUserIdAndCompanyId(
+
+                        currentUser.getUserId(),
+
+                        currentUser.getCompanyId())
+
+                .orElseThrow(() ->
+
+                        new ResourceNotFoundException(
+
+                                "Employee not found"));
+
+    }
 
     @Override
     public AttendanceResponse checkIn(

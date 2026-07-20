@@ -3,6 +3,8 @@ package com.hrms.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -36,9 +38,25 @@ Optional<Payroll> findByIdAndCompanyId(
         Long companyId);
 
 
+Page<Payroll> findByEmployee_IdOrderByPayYearDescPayMonthDesc(
+        Long employeeId,
+        Pageable pageable);
+
+Page<Payroll>
+
+findByEmployeeIdAndMonthAndYear(
+
+        Long employeeId,
+
+        Integer month,
+
+        Integer year,
+
+        Pageable pageable);
 
 
-
+Optional<Payroll> findTopByEmployee_IdOrderByPayYearDescPayMonthDesc(
+        Long employeeId);
 
 
 Long countByCompanyIdAndPayMonthAndPayYear(
@@ -87,5 +105,9 @@ AND p.payMonth = :month
 AND p.payYear = :year
 """)
 Long countEmployees(Long companyId, Integer month, Integer year);
+
+
+
+
 
 }

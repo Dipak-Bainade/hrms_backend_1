@@ -3,7 +3,7 @@ package com.hrms.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.hrms.enums.LeaveStatus;
+import com.hrms.enums.DocumentType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,50 +20,62 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "leave_requests")
+@Table(name = "employee_documents")
 @Getter
 @Setter
-public class LeaveRequest extends BaseEntity{
-	
- 
+public class EmployeeDocument {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "leave_type_id", nullable = false)
-    private LeaveType leaveType;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
-    @Column(nullable = false)
-    private LocalDate fromDate;
-
-    @Column(nullable = false)
-    private LocalDate toDate;
-
-    @Column(nullable = false)
-    private Double totalDays;
-
-    @Column(length = 1000)
-    private String reason;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private LeaveStatus status = LeaveStatus.PENDING;
+    private DocumentType documentType;
+
+    @Column(nullable = false)
+    private String originalFileName;
+
+    @Column(nullable = false)
+    private String storedFileName;
+
+    @Column(nullable = false)
+    private String filePath;
+
+    @Column(nullable = false)
+    private String contentType;
+
+    @Column(nullable = false)
+    private Long fileSize;
+
+    private Integer version = 1;
+
+    private LocalDate expiryDate;
+
+    @Column(nullable = false)
+    private Boolean verified = false;
+
+    @Column(nullable = false)
+    private Boolean active = true;
+
+    private LocalDateTime uploadedAt;
     
-    private LocalDateTime appliedAt;
-
-    private LocalDateTime approvedAt;
-
-    private String approverRemarks;
-
+    
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by")
-    private User approvedBy;
-    
+    @JoinColumn(name = "verified_by")
+    private User verifiedBy;
+
+    private LocalDateTime verifiedAt;
+
+    @Column(length = 500)
+    private String verificationRemarks;
 
 }

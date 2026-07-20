@@ -10,6 +10,7 @@ import com.hrms.dto.payroll.AttendanceSummary;
 import com.hrms.dto.payroll.PayrollCalculationResult;
 import com.hrms.dto.payroll.PayslipResponse;
 import com.hrms.dto.request.PayrollRequest;
+import com.hrms.dto.response.PayrollDashboardResponse;
 import com.hrms.dto.response.PayrollResponse;
 import com.hrms.entity.Employee;
 import com.hrms.entity.EmployeeSalary;
@@ -493,6 +494,12 @@ public class PayrollServiceImpl
 	                "Unable to generate payslip PDF", e);
 
 	    }
+	}
+
+	@Override
+	public PayrollDashboardResponse getDashboard(Integer month, Integer year) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
     

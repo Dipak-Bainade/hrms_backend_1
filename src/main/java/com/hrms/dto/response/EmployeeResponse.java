@@ -3,10 +3,12 @@ package com.hrms.dto.response;
 import java.time.LocalDate;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class EmployeeResponse {
 	
     private Long id;
@@ -32,5 +34,13 @@ public class EmployeeResponse {
     private String designationName;
 
     private Boolean active;
+    
+    private String address;
+    
+    private String city;
+    
+    private String state;
+    
+    private String pinCode;
 
 }

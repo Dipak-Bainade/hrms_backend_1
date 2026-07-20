@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.hrms.entity.LeaveRequest;
 import com.hrms.enums.LeaveStatus;
@@ -175,6 +176,65 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     
     
     
+    Page<LeaveRequest> findByEmployee_IdOrderByAppliedAtDesc(
+            Long employeeId,
+            Pageable pageable);
+    
+    
+    @Query("""
+            SELECT COUNT(l)
+            FROM LeaveRequest l
+            WHERE l.employee.id = :employeeId
+            AND l.status = 'PENDING'
+            """)
+    long countPending(
+            @Param("employeeId") Long employeeId);
+
+
+
+    @Query("""
+            SELECT COUNT(l)
+            FROM LeaveRequest l
+            WHERE l.employee.id = :employeeId
+            AND l.status = 'APPROVED'
+            """)
+    long countApproved(
+            @Param("employeeId") Long employeeId);
+
+
+
+    @Query("""
+            SELECT COUNT(l)
+            FROM LeaveRequest l
+            WHERE l.employee.id = :employeeId
+            AND l.status = 'REJECTED'
+            """)
+    long countRejected(
+            @Param("employeeId") Long employeeId);
+
+
+
+    @Query("""
+            SELECT COUNT(l)
+            FROM LeaveRequest l
+            WHERE l.employee.id = :employeeId
+            AND l.status = 'CANCELLED'
+            """)
+    long countCancelled(
+            @Param("employeeId") Long employeeId);
+
+
+
+    @Query("""
+            SELECT COUNT(l)
+            FROM LeaveRequest l
+            WHERE l.employee.id = :employeeId
+            AND l.fromDate >= :date
+            AND l.status = 'APPROVED'
+            """)
+    long countUpcoming(
+            @Param("employeeId") Long employeeId,
+            @Param("date") LocalDate date);
     
     
     

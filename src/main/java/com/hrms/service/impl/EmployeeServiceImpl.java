@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.hrms.dto.request.EmployeeRequest;
+import com.hrms.dto.request.UpdateMyProfileRequest;
 import com.hrms.dto.response.EmployeeResponse;
 import com.hrms.entity.Company;
 import com.hrms.entity.Department;
@@ -210,20 +211,24 @@ public class EmployeeServiceImpl implements EmployeeService{
 	    
 	    private EmployeeResponse mapToResponse(Employee employee) {
 
-	        return new EmployeeResponse(
-	                employee.getId(),
-	                employee.getEmployeeCode(),
-	                employee.getFirstName(),
-	                employee.getLastName(),
-	                employee.getEmail(),
-	                employee.getMobile(),
-	                employee.getDateOfBirth(),
-	                employee.getGender(),
-	                employee.getJoiningDate(),
-	                employee.getDepartment().getDepartmentName(),
-	                employee.getDesignation().getDesignationName(),
-	                employee.getActive()
-	        );
+	        return EmployeeResponse.builder()
+	                .id(employee.getId())
+	                .employeeCode(employee.getEmployeeCode())
+	                .firstName(employee.getFirstName())
+	                .lastName(employee.getLastName())
+	                .email(employee.getEmail())
+	                .mobile(employee.getMobile())
+	                .dateOfBirth(employee.getDateOfBirth())
+	                .gender(employee.getGender())
+	                .joiningDate(employee.getJoiningDate())
+	                .departmentName(employee.getDepartment().getDepartmentName())
+	                .designationName(employee.getDesignation().getDesignationName())
+	                .active(employee.getActive())
+	                .address(employee.getAddress())
+	                .city(employee.getCity())
+	                .state(employee.getState())
+	                .pinCode(employee.getPinCode())
+	                .build();
 	    }
 	    
 	    @Override
@@ -299,5 +304,59 @@ public class EmployeeServiceImpl implements EmployeeService{
 
 	        employeeRepository.save(employee);
 	    }
+	    
+	    
+	    
+	    @Override
+	    @Transactional
+	    public EmployeeResponse updateMyProfile(
+	            UpdateMyProfileRequest request) {
+
+	        Employee employee =
+	                employeeRepository
+	                        .findByUserIdAndCompanyId(
+	                                currentUser.getUserId(),
+	                                currentUser.getCompanyId())
+	                        .orElseThrow(() ->
+	                                new ResourceNotFoundException(
+	                                        "Employee not found"));
+
+	        employee.setMobile(request.getMobile());
+
+	        employee.setAddress(request.getAddress());
+
+	        employee.setCity(request.getCity());
+
+	        employee.setState(request.getState());
+
+	        employee.setPinCode(request.getPinCode());
+
+	        employee.setEmergencyContact(
+	                request.getEmergencyContact());
+
+	        employee.setProfilePhoto(
+	                request.getProfilePhoto());
+
+	        employee =
+	                employeeRepository.save(employee);
+
+	        return mapToResponse(employee);
+	    }
+	    
+	    @Override
+	    @Transactional(readOnly = true)
+	    public EmployeeResponse getMyProfile() {
+
+	        Employee employee = employeeRepository
+	                .findByUserIdAndCompanyId(
+	                        currentUser.getUserId(),
+	                        currentUser.getCompanyId())
+	                .orElseThrow(() ->
+	                        new ResourceNotFoundException(
+	                                "Employee not found"));
+
+	        return mapToResponse(employee);
+	    }
+	    
 	    
 }

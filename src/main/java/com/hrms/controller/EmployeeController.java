@@ -1,8 +1,11 @@
 package com.hrms.controller;
 
+import java.time.LocalDate;
+
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,9 +22,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hrms.dto.request.EmployeeRequest;
+import com.hrms.dto.request.UpdateMyProfileRequest;
 import com.hrms.dto.response.ApiResponse;
+import com.hrms.dto.response.AttendanceResponse;
+import com.hrms.dto.response.AttendanceSummaryResponse;
+import com.hrms.dto.response.EmployeeAttendanceDashboardResponse;
 import com.hrms.dto.response.EmployeeResponse;
 import com.hrms.entity.Employee;
+import com.hrms.service.EmployeeSelfServiceService;
 import com.hrms.service.EmployeeService;
 
 import jakarta.validation.Valid;
@@ -34,9 +42,14 @@ import lombok.RequiredArgsConstructor;
 public class EmployeeController {
 	
 	private final EmployeeService employeeService;
+	private final EmployeeSelfServiceService employeeSelfServiceService;
 
-	public EmployeeController(EmployeeService employeeService) {
+	public EmployeeController(
+	        EmployeeService employeeService,
+	        EmployeeSelfServiceService employeeSelfServiceService) {
+
 	    this.employeeService = employeeService;
+	    this.employeeSelfServiceService = employeeSelfServiceService;
 	}
 	
 	@GetMapping("/hello")
@@ -155,6 +168,163 @@ public class EmployeeController {
                                 : "Employee deactivated successfully.")
                         .build());
     }
+    
+    @PutMapping("/me")
+    @PreAuthorize("hasAuthority('EMPLOYEE_UPDATE')")
+    public ResponseEntity<ApiResponse<EmployeeResponse>>
+    updateMyProfile(
+            @RequestBody
+            UpdateMyProfileRequest request) {
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<EmployeeResponse>builder()
+
+                        .success(true)
+
+                        .message("Profile updated successfully.")
+
+                        .data(employeeSelfServiceService.updateMyProfile(request))
+
+                        .build());
+
+    }
 	
+    @GetMapping("/profile")
+
+    @PreAuthorize("hasAuthority('EMPLOYEE_SELF_SERVICE')")
+
+    public ResponseEntity<ApiResponse<EmployeeResponse>>
+
+    myProfile() {
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<EmployeeResponse>builder()
+
+                        .success(true)
+
+                        .message("Profile fetched successfully.")
+
+                        .data(employeeSelfServiceService.getMyProfile())
+
+                        .build());
+
+    }
+    
+    @PutMapping("/profile")
+
+    @PreAuthorize("hasAuthority('EMPLOYEE_SELF_SERVICE')")
+
+    public ResponseEntity<ApiResponse<EmployeeResponse>>
+
+    updateProfile(
+
+            @RequestBody
+
+            @Valid
+
+            UpdateMyProfileRequest request) {
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<EmployeeResponse>builder()
+
+                        .success(true)
+
+                        .message("Profile updated successfully.")
+
+                        .data(
+
+                        		employeeService.updateMyProfile(request))
+
+                        .build());
+
+    }
+    
+    
+    @GetMapping("/attendance")
+    @PreAuthorize("hasAuthority('EMPLOYEE_SELF_SERVICE')")
+    public ResponseEntity<ApiResponse<Page<AttendanceResponse>>> getAttendance(
+
+            @RequestParam LocalDate fromDate,
+
+            @RequestParam LocalDate toDate,
+
+            Pageable pageable) {
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<Page<AttendanceResponse>>builder()
+
+                        .success(true)
+
+                        .message("Attendance history fetched successfully.")
+
+                        .data(
+
+                        		employeeSelfServiceService.getMyAttendance(fromDate, toDate, pageable)
+                             )
+                        .build());
+
+    }
+    
+    @GetMapping("/attendance/monthly")
+    @PreAuthorize("hasAuthority('EMPLOYEE_SELF_SERVICE')")
+    public ResponseEntity<ApiResponse<AttendanceSummaryResponse>>
+    getMonthlyAttendance(
+
+            @RequestParam int month,
+
+            @RequestParam int year) {
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<AttendanceSummaryResponse>builder()
+
+                        .success(true)
+
+                        .message("Monthly attendance fetched successfully.")
+
+                        .data(
+
+                        		employeeSelfServiceService.getMonthlyAttendance(
+
+                                        month,
+
+                                        year))
+
+                        .build());
+
+    }
+    
+    @GetMapping("/attendance/dashboard")
+    @PreAuthorize("hasAuthority('EMPLOYEE_SELF_SERVICE')")
+    public ResponseEntity<ApiResponse<EmployeeAttendanceDashboardResponse>>
+    dashboard(
+
+            @RequestParam int month,
+
+            @RequestParam int year) {
+
+        return ResponseEntity.ok(
+
+                ApiResponse.<EmployeeAttendanceDashboardResponse>builder()
+
+                        .success(true)
+
+                        .message("Attendance dashboard fetched successfully.")
+
+                        .data(
+
+                        		employeeSelfServiceService.getAttendanceDashboard(
+
+                                        month,
+
+                                        year))
+
+                        .build());
+
+    }
 	
 }

@@ -84,4 +84,26 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long>{
 
     		        int year);
     
+    Page<Attendance> findByEmployeeIdAndAttendanceDateBetweenOrderByAttendanceDateDesc(
+
+            Long employeeId,
+
+            LocalDate fromDate,
+
+            LocalDate toDate,
+
+            Pageable pageable);
+    
+    List<Attendance> findByEmployeeIdAndAttendanceDateBetween(
+
+            Long employeeId,
+
+            LocalDate start,
+
+            LocalDate end);
+    
+    List<Attendance> findTop10ByEmployeeIdOrderByAttendanceDateDesc(
+
+            Long employeeId);
+    
 }

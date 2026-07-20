@@ -55,4 +55,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long>{
     		        @Param("search") String search,
     		        Pageable pageable);
     
+    Optional<Employee>
+
+    findByUserIdAndCompanyId(
+
+            Long userId,
+
+            Long companyId);
+    
 }

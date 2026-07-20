@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 
 import com.hrms.dto.request.EmployeeRequest;
+import com.hrms.dto.request.UpdateMyProfileRequest;
 import com.hrms.dto.response.EmployeeResponse;
 
 
@@ -34,4 +35,8 @@ public interface EmployeeService {
     
     void updateEmployeeStatus(Long id, boolean active);
     
+    EmployeeResponse updateMyProfile(
+            UpdateMyProfileRequest request);
+    
+    EmployeeResponse getMyProfile();
 }
